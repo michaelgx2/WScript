@@ -137,18 +137,19 @@
 </value>
   </data>
   <data name="txtScript.Text" xml:space="preserve">
-    <value>clear();
-msg("test start!");
-msg("test with 3 seconds period.",3);
-dim("param1", "num", 13);
+    <value>clear();//Custom command, to clear logs.
+msg("test start!");//Custom command, to show logs.
+msg("test with 3 seconds period.",3);//Custom command, to show logs and wait for 3 secs.
+dim("param1", "num", 13);//System command, to declare a number type parameter called param1 with default value 13
 msg("param is [$param1].");
-set("param1", "+", 90);
+set("param1", "+", 90);//System command, add 90 to param1 and save the result to param1 itself
 msg("param is [$param1].");
 dim("param2", "num", 80);
-if("param1", "[$param2]", "&gt;", proc1, proc2);
-loop(loopProc, 4);
+if("param1", "[$param2]", "&gt;", proc1, proc2);//if param1&gt;param2 the proc1, otherwise proc2.
+loop(loopProc, 4);//run loopProc for 4 times
 msg("test finished.");
 
+//sub processes
 proc1{
 	msg("proc1");
 }

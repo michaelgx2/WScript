@@ -88,6 +88,7 @@
             this.txtScript.Size = new System.Drawing.Size(525, 425);
             this.txtScript.TabIndex = 0;
             this.txtScript.Text = resources.GetString("txtScript.Text");
+            this.txtScript.WordWrap = false;
             // 
             // txtConsole
             // 
