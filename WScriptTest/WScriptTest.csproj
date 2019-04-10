@@ -79,5 +79,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WScriptLib\WScriptLib.csproj">
+      <Project>{3ef7c6ad-f459-4939-a0c0-7de933cd05ed}</Project>
+      <Name>WScriptLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

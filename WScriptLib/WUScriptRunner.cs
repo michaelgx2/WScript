@@ -77,7 +77,7 @@ namespace WScriptLib
             _callbacks.Add(cmd, callback);
         }
 
-        public void RegisterReplacement(string origin, DelReplacement replacer)
+        public void RegisterReplacement(string origin, string replacer)
         {
             if (WScript.StringReplacement.ContainsKey(origin))
             {
@@ -145,26 +145,22 @@ namespace WScriptLib
             RegisterCmd("dim", (WScriptCmd line) =>
             {
                 string key = line.Parameters[0].ToString();
+                if(key == "i") throw new Exception("[i] can not be dim as a parameter. It's a name used by script system.");
+                if(Parameters.ContainsKey(key)) throw new Exception("Cannot dim parameters with same names.");
                 string type = line.Parameters[1].ToString();
                 object val = line.Parameters.Count > 2 ? GetParamVal(line.Parameters[2]) : null;
                 switch (type)
                 {
                     case "number":
                     case "num":
-                        Parameters.Add(key, new WSParam("num", val==null?Convert.ToSingle(val):0));
-                        RegisterReplacement("[$" + key + "]", () => Parameters[key].Value.ToString());
-                        RegisterReplacement("[$0" + key + "]", () => Convert.ToSingle(Parameters[key].Value).ToString("0"));
-                        RegisterReplacement("[$1" + key + "]", () => Convert.ToSingle(Parameters[key].Value).ToString("0.0"));
-                        RegisterReplacement("[$2" + key + "]", () => Convert.ToSingle(Parameters[key].Value).ToString("0.00"));
+                        Parameters.Add(key, new WSParam("num", val!=null?Convert.ToSingle(val):0));
                         break;
                     case "string":
                     case "str":
                         Parameters.Add(key, new WSParam("str", val == null?"":val.ToString()));
-                        RegisterReplacement("[$" + key + "]", () => Parameters[key].Value.ToString());
                         break;
                     case "bool":
                         Parameters.Add(key, new WSParam("bool", val != null && Convert.ToBoolean(val)));
-                        RegisterReplacement("[$" + key + "]", () => Convert.ToBoolean(Parameters[key].Value)?"YES":"NO");
                         break;
                 }
                 return 0;
@@ -233,9 +229,15 @@ namespace WScriptLib
                 }
                 return 0;
             });
-            //loop(循环子过程,循环次数[,"循环变量名"]);
+            //loop(循环子过程,循环次数);
             RegisterCmd("loop", line =>
             {
+                string pro = line.Parameters[0].ToString();
+                int times = Convert.ToInt32(line.Parameters[1]);
+                for (int i = 0; i < times; i++)
+                {
+                    RunProcess(pro);
+                }
 
                 return 0;
             });
@@ -309,8 +311,34 @@ namespace WScriptLib
 
         private void PrepareReplacement()
         {
-            RegisterReplacement("&n;", ()=>"\n");
-            RegisterReplacement("&q;", ()=>"\"");
+            RegisterReplacement("&n;", "\n");
+            RegisterReplacement("&q;", "\"");
+        }
+
+        public string ReplaceParams(string content)
+        {
+            StringBuilder sb = new StringBuilder(content);
+            foreach (var par in Parameters)
+            {
+                switch (par.Value.Type)
+                {
+                    case "num":
+                        sb.Replace("[$" + par.Key + "]", par.Value.Value.ToString())
+                            .Replace("[$0" + par.Key + "]", Convert.ToSingle(par.Value.Value).ToString("0"))
+                            .Replace("[$1" + par.Key + "]", Convert.ToSingle(par.Value.Value).ToString("0.0"))
+                            .Replace("[$2" + par.Key + "]", Convert.ToSingle(par.Value.Value).ToString("0.00"))
+                            .Replace("[$3" + par.Key + "]", Convert.ToSingle(par.Value.Value).ToString("0.000"));
+                        break;
+                    case "str":
+                        sb.Replace("[$" + par.Key + "]", par.Value.Value.ToString());
+                        break;
+                    case "bool":
+                        sb.Replace("[$" + par.Key + "]", Convert.ToBoolean(par.Value.Value)?"YES":"NO");
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
     }
 
@@ -346,7 +374,7 @@ namespace WScriptLib
         Insert
     }
 
-    public struct WSParam
+    public class WSParam
     {
         public string Type;
         public object Value;

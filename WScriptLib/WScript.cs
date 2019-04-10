@@ -11,7 +11,7 @@ namespace WScriptLib
         public string ScrName = "";
         public List<WScriptCmd> Cmds = new List<WScriptCmd>();
         public Dictionary<string, WScript> Processes = new Dictionary<string, WScript>();
-        public static Dictionary<string, DelReplacement> StringReplacement = new Dictionary<string, DelReplacement>(); //全局设置，需要被替换的字符串转义符
+        public static Dictionary<string, string> StringReplacement = new Dictionary<string, string>(); //全局设置，需要被替换的字符串转义符
 
         public WScript() { }
 
@@ -51,7 +51,7 @@ namespace WScriptLib
                             //替换字符串
                             foreach (var replace in StringReplacement)
                             {
-                                buff = buff.Replace(replace.Key, replace.Value());
+                                buff = buff.Replace(replace.Key, replace.Value);
                             }
                             temp.Parameters.Add(buff); //加入字符串参数
                             buff = "";
@@ -125,7 +125,7 @@ namespace WScriptLib
                                 }
                                 else
                                 {
-                                    if (string.IsNullOrEmpty(buff.Trim()))
+                                    if (!string.IsNullOrEmpty(buff.Trim()))
                                     {
                                         temp.Parameters.Add("&" + buff.Trim()); //Add as process name
                                     }
@@ -170,7 +170,7 @@ namespace WScriptLib
                                 }
                                 else
                                 {
-                                    if (string.IsNullOrEmpty(buff.Trim()))
+                                    if (!string.IsNullOrEmpty(buff.Trim()))
                                     {
                                         temp.Parameters.Add("&" + buff.Trim()); //Add as process name
                                     }
